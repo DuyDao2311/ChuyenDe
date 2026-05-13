@@ -1,50 +1,74 @@
-import React from 'react'
-import './Footer.css'
+import React, { useState, useContext } from 'react'
+import { Link } from 'react-router-dom'
+import './Header.css'
+import { AuthContext } from '../Context/AuthContext' // Import Context để kiểm tra đăng nhập
 
-import TwitterIcon from '@material-ui/icons/Twitter';
-import LinkedInIcon from '@material-ui/icons/LinkedIn';
-import TelegramIcon from '@material-ui/icons/Telegram';
-import InstagramIcon from '@material-ui/icons/Instagram';
+import MenuIcon from '@material-ui/icons/Menu';
+import ClearIcon from '@material-ui/icons/Clear';
 
-function Footer() {
+function Header() {
+
+    const [menutoggle, setMenutoggle] = useState(false)
+    
+    // Lấy thông tin user từ Context
+    const { user } = useContext(AuthContext)
+
+    const Toggle = () => {
+        setMenutoggle(!menutoggle)
+    }
+
+    const closeMenu = () => {
+        setMenutoggle(false)
+    }
+
     return (
-        <div className='footer'>
-            <div>
-                <div className='footer-data'>
-                    <div className="contact-details">
-                        <h1>Contact Us</h1>
-                        <p>Librarian</p>
-                        <p>PTIT</p>
-                        <p>Hanoi</p>
-                        <p>VietNam</p>
-                        <p><b>Email:</b>dainguyenbn03@gmail.com</p>
-                    </div>
-                    <div className='usefull-links'>
-                        <h1>Usefull Links</h1>
-                        <a href='#home'>Link-1</a>
-                        <a href='#home'>Link-2</a>
-                        <a href='#home'>Link-3</a>
-                        <a href='#home'>Link-4</a>
-                    </div>
-                    <div className='librarian-details'>
-                        <h1>Librarian</h1>
-                        <p>Name</p>
-                        <p>Education</p>
-                        <p>Contact: +84 912345678</p>
-                    </div>
-                </div>
-                <div className="contact-social" >
-                    <a href='#home' className='social-icon'><TwitterIcon style={{ fontSize: 40,color:"rgb(283,83,75)"}} /></a>
-                    <a href='#home' className='social-icon'><LinkedInIcon style={{ fontSize: 40,color:"rgb(283,83,75)"}} /></a>
-                    <a href='#home' className='social-icon'><TelegramIcon style={{ fontSize: 40,color:"rgb(283,83,75)"}} /></a>
-                    <a href='#home' className='social-icon'><InstagramIcon style={{ fontSize: 40,color:"rgb(283,83,75)"}} /></a>
-                </div>
+        <div className="header">
+            <div className="logo-nav">
+                <Link to='/'>
+                    <a href="#home">LIBRARY</a>
+                </Link>
             </div>
-            <div className='copyright-details'>
-                <p className='footer-copyright'>&#169; 2025 copyright all right reserved<br /><span>Designed with ❤️ by Team 2 </span></p>
+            <div className='nav-right'>
+                <input className='search-input' type='text' placeholder='Search a Book'/>
+                <ul className={menutoggle ? "nav-options active" : "nav-options"}>
+                    <li className="option" onClick={() => { closeMenu() }}>
+                        <Link to='/'>
+                            <a href="#home">Home</a>
+                        </Link>
+                    </li>
+                    <li className="option" onClick={() => { closeMenu() }}>
+                        <Link to='/books'>
+                            <a href="#books">Books</a>
+                        </Link>
+                    </li>
+
+                    {/* Logic kiểm tra: Đã đăng nhập thì hiện Dashboard, chưa thì hiện SignIn */}
+                    {user ? (
+                        <li className="option" onClick={() => { closeMenu() }}>
+                            <Link to={user.roles?.includes('admin') ? '/dashboard@admin' : '/dashboard@member'}>
+                                <a href="#dashboard">Dashboard</a>
+                            </Link>
+                        </li>
+                    ) : (
+                        <li className="option" onClick={() => { closeMenu() }}>
+                            <Link to='/signin'>
+                                <a href='signin'>SignIn</a>
+                            </Link>
+                        </li>
+                    )}
+                    
+                </ul>
+            </div>
+
+            <div className="mobile-menu" onClick={() => { Toggle() }}>
+                {menutoggle ? (
+                    <ClearIcon className="menu-icon" style={{ fontSize: 40 }} />
+                ) : (
+                    <MenuIcon className="menu-icon" style={{ fontSize: 40 }} />
+                )}
             </div>
         </div>
     )
 }
 
-export default Footer
+export default Header
